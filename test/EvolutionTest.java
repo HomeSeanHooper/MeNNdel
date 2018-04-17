@@ -1,24 +1,29 @@
+import genes.FloatGene;
+import genes.Gene;
 import genome.Genome;
 import genes.GeneUniverse;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 
 class EvolutionTest {
 
-    GeneUniverse geneList;
+    GeneUniverse geneUniverse;
 
     public EvolutionTest() {
-        Yaml yaml = new Yaml();
-        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("ex1.yaml");
-        geneList = yaml.loadAs( stream, GeneUniverse.class );
+        Gene g1 = new FloatGene("1", 2,1,1,"int");
+        Gene g2 = new FloatGene("2", 5.0f,1.0f,1.0f,"float");
+        Gene g3 = new FloatGene("3", 200,100,10,"int");
+        g1.randomize();
+        g2.randomize();
+        g3.randomize();
+        geneUniverse = new GeneUniverse();
+        geneUniverse.setGeneList(Arrays.asList(g1, g2, g3));
     }
 
-
     public Genome createGenome() {
-        return new Genome(geneList.getGeneList());
+        return new Genome(geneUniverse.getGeneList());
     }
 
     public void show(Genome genome) {
@@ -40,7 +45,19 @@ class EvolutionTest {
     }
 
 
-    public static void demo(String[] args) {
+    public void popTest(){
+        Population pop = new Population(10);
+        // building an initial Population will randomize genes
+        pop.initGenomes(geneUniverse);
+
+        pop.randomFitness();
+        pop.evolve();
+        System.out.println(pop.showGenomes());
+        System.out.println(pop.showTasks());
+    }
+
+
+    public static void genomeDemo(String[] args) {
         EvolutionTest et = new EvolutionTest();
         Genome mom = et.createGenome();
         Genome dad = et.createGenome();
@@ -58,8 +75,13 @@ class EvolutionTest {
         et.show(child);
     }
 
+    public static void popDemo(String[] args) {
+        EvolutionTest et = new EvolutionTest();
+        et.popTest();
+    }
+
     public static void main(String[] args) {
-        demo(args);
+        popDemo(args);
     }
 
 }
