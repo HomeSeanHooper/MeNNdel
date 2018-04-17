@@ -1,0 +1,5 @@
+name: "rnn_size"
+max: 256
+min: 8
+step: 10
+type: "int"

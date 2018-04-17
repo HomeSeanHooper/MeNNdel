@@ -1,0 +1,31 @@
+genes:
+  - name: "rnn_size"
+    max: 256
+    min: 8
+    step: 10
+    type: "int"
+  - name: "num_layers"
+    max: 1
+    min: 4
+    step: 1
+    type: "int"
+  - name: "dropout"
+    max: 1.0f
+    min: 0.0f
+    step: 0.1f
+    type: "float"
+  - name: "learning_rate"
+    max: 1e-2f
+    min: 1e-3f
+    step: 1e-3f
+    type: "float"
+  - name: "lr_decay_every"
+    max: 10
+    min: 2
+    step: 2
+    type: "int"
+  - name: "lr_decay_factor"
+    max: 1e-2f
+    min: 1e-3f
+    step: 1e-3f
+    type: "float"

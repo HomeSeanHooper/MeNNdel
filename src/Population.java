@@ -1,8 +1,8 @@
 import java.util.List;
 
-public interface Evolution {
+public interface Population {
     /**
-     * Evolution interface
+     * Population interface
      */
 
     public NNGenome recombine(NNGenome a, NNGenome b);
@@ -11,5 +11,5 @@ public interface Evolution {
 
     public List<NNGenome> select(List<NNGenome> population);
 
-    
+
 }
