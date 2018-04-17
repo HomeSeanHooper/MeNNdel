@@ -2,18 +2,44 @@ package genome;
 
 import com.sun.istack.internal.NotNull;
 import genes.Gene;
+import genes.GeneUniverse;
 
 import java.util.*;
 
 
 import java.util.stream.Collectors;
 
-public class Genome {
+public class Genome{
 
     private HashMap<String, Gene> genes;
 
+    private float fitness = 0.0f; // initial fitness is 0
+
+    public float getFitness() {
+        return fitness;
+    }
+
+    public void setFitness(float fitness) {
+        this.fitness = fitness;
+    }
+
     public HashMap<String, Gene> getGenes() {
         return genes;
+    }
+
+    public Genome(GeneUniverse genes) {
+        this.genes = new HashMap<>();
+        for (Gene gene: genes.getGeneList()) {
+            gene.randomize();
+            this.genes.put(gene.getName(), gene);
+        }
+    }
+
+    public Genome(List<Gene> genes) {
+        this.genes = new HashMap<>();
+        for (Gene gene: genes) {
+            this.genes.put(gene.getName(), gene);
+        }
     }
 
     public Genome(HashMap<String, Gene> genes) {
@@ -22,7 +48,11 @@ public class Genome {
     }
 
     public Genome(Genome parent) {
+        /**
+         * clones a parent
+         */
         this(parent.getGenes());
+        this.setFitness(parent.getFitness());
     }
 
 
@@ -35,6 +65,9 @@ public class Genome {
     }
 
     public void mutate(int nMutations) {
+        /**
+         * randomly choose features to mutate. May select the same one twice.
+         */
         Random rand = new Random();
         ArrayList<String> geneNames = new ArrayList<>(genes.keySet());
 
@@ -53,6 +86,10 @@ public class Genome {
     }
 
     public static List<Genome> breed(@NotNull Genome dad, @NotNull Genome mom, double xoverRate) {
+        /**
+         * Recombines two genomes, creates two children
+         *
+         */
         Random rand = new Random();
         Genome child1 = new Genome(dad);
         Genome child2 = new Genome(mom);
@@ -77,3 +114,5 @@ public class Genome {
     }
 
 }
+
+

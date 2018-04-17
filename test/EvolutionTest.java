@@ -1,19 +1,24 @@
 import genome.Genome;
 import genes.GeneUniverse;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import org.yaml.snakeyaml.Yaml;
+
+import java.io.InputStream;
+import java.util.List;
 
 
 class EvolutionTest {
 
+    GeneUniverse geneList;
+
+    public EvolutionTest() {
+        Yaml yaml = new Yaml();
+        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("ex1.yaml");
+        geneList = yaml.loadAs( stream, GeneUniverse.class );
+    }
+
 
     public Genome createGenome() {
-        GeneUniverse geneUniverse = new GeneUniverse("experiment.yaml");
-        return new Genome(geneUniverse.getGeneHashMap());
+        return new Genome(geneList.getGeneList());
     }
 
     public void show(Genome genome) {
@@ -34,11 +39,6 @@ class EvolutionTest {
         return child;
     }
 
-    public Genome testGeneUniverse() {
-        GeneUniverse gu = new GeneUniverse("experiment.yaml");
-        Genome test = new Genome(gu.getGeneHashMap());
-        return test;
-    }
 
     public static void demo(String[] args) {
         EvolutionTest et = new EvolutionTest();
@@ -59,9 +59,7 @@ class EvolutionTest {
     }
 
     public static void main(String[] args) {
-        EvolutionTest et = new EvolutionTest();
-        Genome test = et.testGeneUniverse();
-        et.show(test);
+        demo(args);
     }
 
 }

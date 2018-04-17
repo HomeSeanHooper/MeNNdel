@@ -1,0 +1,65 @@
+{
+  "name": "MeNNdel",
+  "id": "id1",
+  "collection": "path",
+  "source_file": "source",
+  "max_epochs": "1",
+  "gpu_backend": "cuda",
+  "pop_size": "10",
+  "elitism": "2",
+  "n_mutations": "2",
+
+  "genes": [
+    {
+      "name": "rnn_size",
+      "upperLim": "256",
+      "lowerLim": "8",
+      "mutStep": "10",
+      "outputType": "int"
+    },
+    {
+      "name": "learning_rate",
+      "upperLim": "1e-2f",
+      "lowerLim": "1e-3f",
+      "mutStep": "1e-3f",
+      "outputType": "int"
+    },
+    {
+      "name": "dropout",
+      "upperLim": "1.0f",
+      "lowerLim": "0.0f",
+      "mutStep": "0.1f",
+      "outputType": "float"
+    },
+    {
+      "name": "seq_length",
+      "upperLim": "100",
+      "lowerLim": "20",
+      "mutStep": "10",
+      "outputType": "int"
+    },
+    {
+      "name": "grad_clip",
+      "upperLim": "10",
+      "lowerLim": "1",
+      "mutStep": "1",
+      "outputType": "int"
+    },
+    {
+      "name": "batch_size",
+      "upperLim": "100",
+      "lowerLim": "20",
+      "mutStep": "10",
+      "outputType": "int"
+    },
+    {
+      "name": "num_layers",
+      "upperLim": "1",
+      "lowerLim": "4",
+      "mutStep": "1",
+      "outputType": "int"
+    }
+
+  ]
+
+}

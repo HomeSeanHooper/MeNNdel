@@ -1,54 +1,32 @@
 package genes;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
-import org.yaml.snakeyaml.Yaml;
 
 public class GeneUniverse {
     /**
-     * A universe of genes. Add more when needed.
+     * A universe of geneList. Read from JSON.
+     * These are templates for parameter ranges and steps,
+     * for instance:
+     * "genes": [
+     *     {
+     *       "name": "rnn_size",
+     *       "upperLim": "256",
+     *       "lowerLim": "8",
+     *       "mutStep": "10",
+     *       "outputType": "int"
+     *     },
+     *     ...
+     *
+     *     means that a FloatGene should be created with these params.
      */
 
-    HashMap<String, List> geneTypes;
+    List<Gene> geneList;
 
-    public GeneUniverse(final String yaml_name) {
-        Yaml yaml = new Yaml();
-        InputStream stream = this.getClass().getClassLoader().getResourceAsStream(yaml_name);
-        geneTypes = (HashMap<String, List>) yaml.load(stream);
+    public List<Gene> getGeneList() {
+        return geneList;
     }
 
-    public HashMap<String, Gene> getGeneHashMap() {
-        HashMap<String, Gene> geneHashMap = new HashMap<>();
-
-        List<HashMap<String, Object>> geneList = (ArrayList<HashMap<String, Object>> ) geneTypes.get("genes");
-        for (HashMap<String, Object> geneMap: geneList) {
-            System.out.println(geneMap);
-            Float step = Float.parseFloat((String) geneMap.get("step"));
-            System.out.println(geneMap.get("step"));
-            //Gene gene = parseGene(geneMap);
-            //geneHashMap.put(gene.getName(), gene);
-        }
-
-        return geneHashMap;
+    public void setGeneList(List<Gene> geneList) {
+        this.geneList = geneList;
     }
-
-    private Gene parseGene(HashMap<String, String> item) {
-        Gene gene = null;
-        System.out.println(item);
-        System.out.println(item.get("step").toString());
-
-         gene = new FloatGene(item.get("name"),
-                Float.parseFloat(item.get("step")),
-                Float.parseFloat(item.get("max")),
-                Float.parseFloat(item.get("min")),
-                 item.get("type"));
-
-        return gene;
-    }
-
-
 }

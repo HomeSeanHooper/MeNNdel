@@ -4,6 +4,14 @@ import java.util.Random;
 
 public class FloatGene implements Gene {
 
+    Random rand = new Random();
+    private String name;
+    private float val;
+    private float mutStep;
+    private float upperLim;
+    private float lowerLim;
+    private String outputType = "float";
+
     public FloatGene(final String name, final float upperLim, final float lowerLim, final float mutStep, final String outputType) {
         this.name = name;
         this.mutStep = mutStep;
@@ -11,12 +19,7 @@ public class FloatGene implements Gene {
         this.lowerLim = lowerLim;
         this.outputType = outputType;
     }
-
-    Random rand = new Random();
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    public FloatGene(){}
 
     public float getMutStep() {
         return mutStep;
@@ -50,19 +53,12 @@ public class FloatGene implements Gene {
         this.outputType = outputType;
     }
 
-    private String name;
-    private float val;
-    private float mutStep;
-    private float upperLim;
-    private float lowerLim;
-    private String outputType = "float";
+    public float getValue() {
+        return val;
+    }
 
     public void setValue(float val) {
         this.val = val;
-    }
-
-    public float getValue() {
-        return val;
     }
 
     public void randomize() {
@@ -71,6 +67,10 @@ public class FloatGene implements Gene {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void mutate() {
