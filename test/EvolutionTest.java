@@ -62,39 +62,38 @@ class EvolutionTest {
         Population pop = new Population(popSize, 2, 1);
         // building an initial Population will randomize genes
         List<Genome> parents = initGenomes(popSize);
-        randomFitness(parents);
+        dummyFitness(parents);
 
-        List<Genome> children = pop.evolve(parents);
+        // let this go on for some generations
+        for (int i=0; i<3; i++) {
+            List<Genome> children = pop.evolve(parents);
+            System.out.println(String.format("\n----\nGeneration %d", i));
+            System.out.println("Parents");
+            Population.sortGenomes(parents);
+            show(parents);
+            System.out.println("Children");
+            Population.sortGenomes(children);
+            show(children);
+            System.out.println("Elites");
+            show(pop.getElites());
 
-        System.out.println("Parents");
-        Population.sortGenomes(parents);
-        show(parents);
-        System.out.println("Children");
-        Population.sortGenomes(children);
-        show(children);
-        System.out.println("Elites");
-        show(pop.getElites());
+            parents = new ArrayList<>(children);
 
-
+        }
         // collect new genomes
     }
 
-    private void randomFitness(List<Genome> genomes) {
-        /**
-         * Assigns random fitness for testing
-         */
-        Random rand = new Random();
+    private void dummyFitness(List<Genome> genomes) {
         for (Genome genome: genomes) {
-            genome.setFitness(rand.nextFloat());
-
+            dummyFitness(genome);
         }
     }
 
     private void dummyFitness(Genome genome) {
         // apply a dummy fitness score for testing.
-        float fitness = genome.getGene("g1").getValue()
-                * genome.getGene("g2").getValue() /
-                genome.getGene("g3").getValue();
+        float fitness = genome.getGene("1").getValue()
+                * genome.getGene("2").getValue() /
+                genome.getGene("3").getValue();
         genome.setFitness(fitness);
     }
 
