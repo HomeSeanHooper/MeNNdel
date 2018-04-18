@@ -8,6 +8,7 @@
   "pop_size": "10",
   "elitism": "2",
   "n_mutations": "2",
+  "max_generations": "10",
 
   "genes": [
     {

@@ -19,6 +19,15 @@ public class FloatGene implements Gene {
         this.lowerLim = lowerLim;
         this.outputType = outputType;
     }
+
+    public FloatGene(final FloatGene other) {
+        this.name = other.getName();
+        this.mutStep = other.getMutStep();
+        this.upperLim = other.getUpperLim();
+        this.lowerLim = other.getLowerLim();
+        this.outputType = other.getOutputType();
+    }
+
     public FloatGene(){}
 
     public float getMutStep() {
@@ -92,8 +101,10 @@ public class FloatGene implements Gene {
     public String getCommandItem() {
 
         if (outputType.equals("int")) {
-            return String.format("-%s %n", getName(), (int) getValue());
-        } // else default to floati
+            return String.format("-%s %d", getName(), Math.round(getValue()) );
+        } // else default to float
         return String.format("-%s %f", getName(), getValue());
     }
+
+
 }

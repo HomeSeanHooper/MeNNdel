@@ -1,70 +1,92 @@
-import genes.GeneUniverse;
 import genome.Genome;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 
 public class Population {
 
-    public Population() {
-        // read JSON config, set up geneList for genomes
-    }
+    // Keep elites alive
+    private List<Genome> elites;
 
-    // This is our population
-    private List<Genome> genomes;
+    // evolution params
+    private int popSize;
+    private int elitism;
+    private int nMutations;
 
-    // and the desired size
-    private int popSize = 10;
-
-    public void initGenomes(GeneUniverse geneList, int popSize){
-        // create popSize genomes based on geneList
-        for (int i = 0; i < popSize; i++) {
-            genomes.add(new Genome(geneList));
-        }
+    public Population(int popSize, int elitism, int nMutations) {
         this.popSize = popSize;
-
+        this.elitism = elitism;
+        this.nMutations = nMutations;
+        elites = new ArrayList<>();
     }
 
-    public void evolve(List<Genome> raw_genomes) {
+    public List<Genome> getElites() {
+        return elites;
+    }
+
+    public static void sortGenomes(List<Genome> genomes) {
+        genomes.sort(new FitnessComparator());
+    }
+
+    public List<Genome> evolve(List<Genome> parentGeneration) {
         /**
-         * Load back genomes, provide a fitness score (e.g. loss). This should be added
-         * along with the Genome parameter values
+         * This is the main method. It takes a population of genomes (any size is fine),
+         * breeds, evolves and mutates. The elites are retained between runs,
+         * so they will always contribute to the next generation.
+         *
+         * This method returns a list of genomes of popSize
          */
 
-        genomes.clear();
+        // Prepare the next generation
+        List<Genome> childGeneration = new ArrayList<>();
 
-        Collections.sort(raw_genomes, new FitnessComparator());
+        // Append elites (if any) to the parents
+        parentGeneration.addAll(elites);
 
-        // elitism. Select the N best genomes and do not mutate them.
-        int elitism = 2; // goal is to read from config
+        // Sort the parents by fitness
+        parentGeneration.sort(new FitnessComparator());
 
-        List<Genome> breeders = new ArrayList<>();
-        for (int i=0; i<elitism; i++) {
-            breeders.add(raw_genomes.remove(0));
+        // Keep the best as elites
+        elites.clear();
+        elites.addAll(parentGeneration.subList(0, elitism));
+        parentGeneration.removeAll(parentGeneration.subList(0, elitism));
+
+        // Mutate genomes
+        for (Genome genome : parentGeneration) {
+            genome.mutate(nMutations);
         }
 
-        // add children from the best elites
-        List<Genome> children = Genome.breed(breeders.get(0), breeders.get(1));
+        // Add children from the elites
+        for (Genome dad : elites) {
+            for (Genome mom : elites) {
+                if (dad != mom) {
+                    childGeneration.addAll(Genome.breed(dad, mom));
+                }
+            }
 
-        // now fill out the population with mutated genomes from the raw_genomes list
-        genomes.addAll(breeders);
-        genomes.addAll(children);
-
-        int fillSize = popSize - genomes.size();
-        for (int i=0; i<fillSize; i++) {
-            Genome filler = raw_genomes.remove(0);
-            filler.mutate();
-            genomes.add(filler);
         }
 
-        // should check we have popSize genomes
+        // Allow some random genomes breed as well
+        Collections.shuffle(parentGeneration);
+        childGeneration.addAll(Genome.breed(parentGeneration.get(0), parentGeneration.get(1)));
+
+        // and now just fill out the population with parent genomes
+        Collections.shuffle(parentGeneration);
+        childGeneration.addAll(parentGeneration);
+
+        // and return a child generation of popSize
+        return childGeneration.subList(0, popSize);
 
     }
 
 }
 
+
 class FitnessComparator implements Comparator<Genome> {
-    public int compare(Genome a, Genome b)
-    {
-        return Math.round(b.getFitness() - a.getFitness());
+    public int compare(Genome a, Genome b) {
+        return (b.getFitness() - a.getFitness()) > 0 ? 1 : -1;
     }
 }
