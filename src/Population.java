@@ -1,120 +1,92 @@
-import genes.GeneUniverse;
 import genome.Genome;
 
-import java.util.*;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 
 public class Population {
-
-    public Population(int popSize) {
-        // read JSON config, set up geneList for genomes
-        genomes = new ArrayList<>();
-        tasks = new ArrayList<>();
-        elites = new ArrayList<>();
-        this.popSize = popSize;
-    }
-
-    // This is our population
-    private List<Genome> genomes;
 
     // Keep elites alive
     private List<Genome> elites;
 
-    // We also need a task queue
-    private List<Genome> tasks;
+    // evolution params
+    private int popSize;
+    private int elitism;
+    private int nMutations;
 
-    // and the desired size
-    private int popSize = 10;
-
-    public void initGenomes(GeneUniverse geneList){
-        // create popSize genomes based on geneList
-        for (int i = 0; i < popSize; i++) {
-            genomes.add(new Genome(geneList));
-        }
+    public Population(int popSize, int elitism, int nMutations) {
+        this.popSize = popSize;
+        this.elitism = elitism;
+        this.nMutations = nMutations;
+        elites = new ArrayList<>();
     }
 
-
-    private String show(List<Genome> genomeArrayList) {
-        StringBuilder sb = new StringBuilder("Fitness\n");
-        for (Genome genome: genomeArrayList ) {
-            sb.append(String.format("%.2f\n", genome.getFitness()));
-        }
-        return sb.toString();
+    public List<Genome> getElites() {
+        return elites;
     }
 
-    public String showGenomes() {
-        return show(genomes);
+    public static void sortGenomes(List<Genome> genomes) {
+        genomes.sort(new FitnessComparator());
     }
 
-    public String showTasks() {
-        return show(tasks);
-    }
-
-
-    public void evolve() {
+    public List<Genome> evolve(List<Genome> parentGeneration) {
         /**
-         * Load back genomes, provide a fitness score (e.g. loss). This should be added
-         * along with the Genome parameter values
+         * This is the main method. It takes a population of genomes (any size is fine),
+         * breeds, evolves and mutates. The elites are retained between runs,
+         * so they will always contribute to the next generation.
+         *
+         * This method returns a list of genomes of popSize
          */
 
-        // genomes should be full. Should check. Likewise, tasks should be empty
-        tasks.clear();
+        // Prepare the next generation
+        List<Genome> childGeneration = new ArrayList<>();
 
-        Collections.sort(genomes, new FitnessComparator());
+        // Append elites (if any) to the parents
+        parentGeneration.addAll(elites);
 
-        // elitism. Select the N best genomes and do not mutate them.
-        int elitism = 2; // goal is to read from config
+        // Sort the parents by fitness
+        parentGeneration.sort(new FitnessComparator());
 
-        List<Genome> breeders = new ArrayList<>();
-        for (int i=0; i<elitism; i++) {
-            breeders.add(genomes.remove(0));
+        // Keep the best as elites
+        elites.clear();
+        elites.addAll(parentGeneration.subList(0, elitism));
+        parentGeneration.removeAll(parentGeneration.subList(0, elitism));
+
+        // Mutate genomes
+        for (Genome genome : parentGeneration) {
+            genome.mutate(nMutations);
         }
 
-        // add children from the best elites
-        List<Genome> children = Genome.breed(breeders.get(0), breeders.get(1));
-
-        // add these to the tasks list
-        tasks.addAll(breeders);
-        tasks.addAll(children);
-
-        int fillSize = popSize - tasks.size();
-        for (int i=0; i<fillSize; i++) {
-            Genome filler = genomes.remove(0);
-            filler.mutate();
-            tasks.add(filler);
-        }
-        // remove remaining genomes and sort the tasks
-        genomes.clear();
-        Collections.sort(tasks, new FitnessComparator());
-
-        // now, tasks should be full and genomes empty
-    }
-
-    public void randomFitness() {
-        /**
-         * Mostly for testing
-         */
-        Random rand = new Random();
-        for (Genome genome: genomes) {
-            genome.setFitness(rand.nextFloat());
+        // Add children from the elites
+        for (Genome dad : elites) {
+            for (Genome mom : elites) {
+                if (dad != mom) {
+                    childGeneration.addAll(Genome.breed(dad, mom));
+                }
+            }
 
         }
-    }
 
-    public void run() {
-        // step 1, init population
-        //initGenomes();
-        int maxGenerations = 10; // config this
-        for (int i=0; i<maxGenerations; i++) {
-            //while (tasks.isEmpty())
-        }
+        // Allow some random genomes breed as well
+        Collections.shuffle(parentGeneration);
+        childGeneration.addAll(Genome.breed(parentGeneration.get(0), parentGeneration.get(1)));
+
+        // and now just fill out the population with parent genomes
+        Collections.shuffle(parentGeneration);
+        childGeneration.addAll(parentGeneration);
+
+        // and return a child generation of popSize
+        return childGeneration.subList(0, popSize);
+
     }
 
 }
 
+
 class FitnessComparator implements Comparator<Genome> {
-    public int compare(Genome a, Genome b)
-    {
-        return (b.getFitness() - a.getFitness()) > 0 ? 1: -1;
+    public int compare(Genome a, Genome b) {
+        return (b.getFitness() - a.getFitness()) > 0 ? 1 : -1;
     }
 }

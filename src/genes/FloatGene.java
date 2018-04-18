@@ -20,6 +20,14 @@ public class FloatGene implements Gene {
         this.outputType = outputType;
     }
 
+    public FloatGene(final FloatGene other) {
+        this.name = other.getName();
+        this.mutStep = other.getMutStep();
+        this.upperLim = other.getUpperLim();
+        this.lowerLim = other.getLowerLim();
+        this.outputType = other.getOutputType();
+    }
+
     public FloatGene(){}
 
     public float getMutStep() {

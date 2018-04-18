@@ -3,8 +3,7 @@ import genes.Gene;
 import genome.Genome;
 import genes.GeneUniverse;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 class EvolutionTest {
@@ -27,9 +26,14 @@ class EvolutionTest {
     }
 
     public void show(Genome genome) {
-        System.out.println(genome.getCommands());
+        System.out.println(genome.prettyPrint());
     }
 
+    public void show(List<Genome> genomes) {
+        for (Genome genome: genomes ) {
+            show(genome);
+        }
+    }
 
     public void breed(Genome mom, Genome dad) {
         List<Genome> children = Genome.breed(mom, dad);
@@ -44,16 +48,54 @@ class EvolutionTest {
         return child;
     }
 
+    private List<Genome> initGenomes(int popSize){
+        // create popSize genomes based on geneList
+        List<Genome> genomes = new ArrayList<>();
+        for (int i = 0; i < popSize; i++) {
+            genomes.add(new Genome(geneUniverse));
+        }
+        return genomes;
+    }
 
     public void popTest(){
-        Population pop = new Population(10);
+        int popSize = 10;
+        Population pop = new Population(popSize, 2, 1);
         // building an initial Population will randomize genes
-        pop.initGenomes(geneUniverse);
+        List<Genome> parents = initGenomes(popSize);
+        randomFitness(parents);
 
-        pop.randomFitness();
-        pop.evolve();
-        System.out.println(pop.showGenomes());
-        System.out.println(pop.showTasks());
+        List<Genome> children = pop.evolve(parents);
+
+        System.out.println("Parents");
+        Population.sortGenomes(parents);
+        show(parents);
+        System.out.println("Children");
+        Population.sortGenomes(children);
+        show(children);
+        System.out.println("Elites");
+        show(pop.getElites());
+
+
+        // collect new genomes
+    }
+
+    private void randomFitness(List<Genome> genomes) {
+        /**
+         * Assigns random fitness for testing
+         */
+        Random rand = new Random();
+        for (Genome genome: genomes) {
+            genome.setFitness(rand.nextFloat());
+
+        }
+    }
+
+    private void dummyFitness(Genome genome) {
+        // apply a dummy fitness score for testing.
+        float fitness = genome.getGene("g1").getValue()
+                * genome.getGene("g2").getValue() /
+                genome.getGene("g3").getValue();
+        genome.setFitness(fitness);
     }
 
 

@@ -1,6 +1,7 @@
 package genome;
 
 import com.sun.istack.internal.NotNull;
+import genes.FloatGene;
 import genes.Gene;
 import genes.GeneUniverse;
 
@@ -30,8 +31,9 @@ public class Genome{
     public Genome(GeneUniverse genes) {
         this.genes = new HashMap<>();
         for (Gene gene: genes.getGeneList()) {
-            gene.randomize();
-            this.genes.put(gene.getName(), gene);
+            Gene newGene = new FloatGene( (FloatGene) gene);
+            newGene.randomize();
+            this.genes.put(newGene.getName(), newGene);
         }
     }
 
@@ -111,6 +113,12 @@ public class Genome{
 
     public String getCommands() {
         return genes.entrySet().stream().map(x -> x.getValue().getCommandItem() ).collect(Collectors.joining(" "));
+    }
+
+    public String prettyPrint(){
+        StringBuilder sb = new StringBuilder(String.format("%.2f", getFitness()));
+        sb.append(getCommands());
+        return sb.toString();
     }
 
 }
